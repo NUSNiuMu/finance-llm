@@ -95,11 +95,18 @@ def _rnn_state_placeholders(state):
     """Convert RNN state tensors to placeholders, reflecting the same nested tuple structure."""
     # Adapted from @carlthome's comment:
     # https://github.com/tensorflow/tensorflow/issues/2838#issuecomment-302019188
-    if isinstance(state, tf.compat.v1.nn.rnn_cell.LSTMStateTuple):
+    # 检查是否是LSTM状态元组（兼容Keras 3）
+    if hasattr(tf.compat.v1.nn.rnn_cell, 'LSTMStateTuple') and isinstance(state, tf.compat.v1.nn.rnn_cell.LSTMStateTuple):
         c, h = state
         c = tf.placeholder(c.dtype, c.shape, c.op.name)
         h = tf.placeholder(h.dtype, h.shape, h.op.name)
         return tf.compat.v1.nn.rnn_cell.LSTMStateTuple(c, h)
+    elif isinstance(state, tuple) and len(state) == 2:
+        # 处理LSTM状态元组的替代方案
+        c, h = state
+        c = tf.placeholder(c.dtype, c.shape, c.op.name)
+        h = tf.placeholder(h.dtype, h.shape, h.op.name)
+        return (c, h)
     elif isinstance(state, tf.Tensor):
         h = state
         h = tf.placeholder(h.dtype, h.shape, h.op.name)
