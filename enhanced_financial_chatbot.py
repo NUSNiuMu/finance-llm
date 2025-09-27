@@ -643,9 +643,9 @@ class EnhancedFinancialChatbot:
                 dataset_question, dataset_response, similarity = similar_questions[0]
                 
                 if similarity > 0.3:  # 如果相似度较高，直接返回数据集回答
-                    return f"Based on your question, I found a similar question:\n\nQuestion: {dataset_question}\n\nAnswer: {dataset_response}"
+                    return f"{dataset_response}"
                 elif similarity > 0.15:  # 如果相似度中等，返回数据集回答并说明
-                    return f"I found a related financial question:\n\nQuestion: {dataset_question}\n\nAnswer: {dataset_response[:300]}..."
+                    return f"{dataset_response[:1000]}..."
         
         # 分类意图
         intent, confidence = self.classify_intent(user_input)
@@ -670,13 +670,6 @@ class EnhancedFinancialChatbot:
         return """
         Financial Assistant Usage Instructions:
 
-        1. Investment Consultation: Ask about stocks, funds, bonds and other investment advice
-        2. Loan Consultation: Learn about mortgages, car loans, credit loans and other loan information
-        3. Insurance Consultation: Get information about various insurance products
-        4. Banking Services: Consult about account opening, transfers, credit cards and other services
-        5. Exchange Rate Query: Query foreign exchange rates
-        6. Market Analysis: Understand market dynamics and economic conditions
-
         Commands:
         - --pretrained: Toggle pretrained model usage
         - --help: Show this help information
@@ -684,11 +677,10 @@ class EnhancedFinancialChatbot:
         - quit/exit: Exit program
 
         Example Questions:
-        - "What investment advice do you have for stocks?"
-
-        - "What is the mortgage interest rate?"
-        - "How to apply for a credit card?"
-        - "What is the USD exchange rate?"
+        - "Explain the difference between fiscal and monetary policy tools used in economics."
+        - "Explain the classical economic theory and its policy implications."
+        - "Explain how central banks determine currency exchange rates between countries."
+        - "Explain how interest rates change with inflation levels in an economy."
         """
     
     def reset_conversation(self):
