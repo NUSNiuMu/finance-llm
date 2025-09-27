@@ -26,7 +26,13 @@ class EnhancedFinancialChatbot:
         初始化聊天机器人
         
         Args:
-            model_name: 预训练模型名称
+            model_name: 预训练模型名称，支持以下强大模型：
+                - "THUDM/chatglm2-6b" (推荐): ChatGLM2-6B，强大的中英双语对话模型
+                - "THUDM/chatglm-6b": ChatGLM-6B，清华开源对话模型
+                - "baichuan-inc/Baichuan2-7B-Chat": 百川2-7B对话模型
+                - "Qwen/Qwen-7B-Chat": 阿里通义千问7B对话模型
+                - "microsoft/DialoGPT-medium": 原始DialoGPT模型
+                - "models/generative-finetune": 本地微调模型
         """
         self.model_name = model_name
         self.model_backend = model_backend  # "hf" 或 "reddit"
@@ -614,7 +620,7 @@ class EnhancedFinancialChatbot:
         similarities.sort(key=lambda x: x[2], reverse=True)
         return similarities[:top_k]
     
-    def chat(self, user_input: str, use_pretrained: bool = False, use_dataset: bool = True) -> str:
+    def chat(self, user_input: str, use_pretrained: bool = True, use_dataset: bool = True) -> str:
         """
         主要聊天接口
         
@@ -641,11 +647,8 @@ class EnhancedFinancialChatbot:
                 elif similarity > 0.15:  # 如果相似度中等，返回数据集回答并说明
                     return f"I found a related financial question:\n\nQuestion: {dataset_question}\n\nAnswer: {dataset_response[:300]}..."
         
-        # 如果数据集匹配失败或相似度太低，使用规则系统
         # 分类意图
-        print(f"数据集匹配失败或相似度太低，使用规则系统")
         intent, confidence = self.classify_intent(user_input)
-        
         # 提取实体
         entities = self.extract_entities(user_input)
         
@@ -655,8 +658,8 @@ class EnhancedFinancialChatbot:
             response = self.generate_pretrained_response(user_input)
         else:
             # 使用基于规则的回复
-            response = self.generate_rule_based_response(intent, entities)
-        
+            print(f"something wrong")
+
         # 更新对话历史
         self.update_conversation_history(user_input, response)
         
@@ -745,7 +748,7 @@ def main():
     
     # 加载金融数据集并构建规则系统
     print("Loading financial dataset and building rule system...")
-    chatbot.load_financial_dataset(sample_size=50000)  # 使用5000个样本构建规则
+    chatbot.load_financial_dataset(sample_size=100000)  # 使用5000个样本构建规则
     
     # 启动交互式聊天
     chatbot.interactive_chat()
